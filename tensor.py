@@ -1,4 +1,5 @@
 import numpy as np
+from scipy import linalg
 
 
 class tensor:
@@ -6,7 +7,10 @@ class tensor:
         self.tensorSize = (xSize, ySize, zSize)
         self.tensor = threeDimArray
 
-    def circularize(self):
+    def circ(self):
+        return linalg.curculant(self.tensor)
+
+
 
 
 
