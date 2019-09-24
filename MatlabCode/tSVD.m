@@ -30,23 +30,23 @@ end
 
 for i=1:n3
     if fl==0
-      [U1,S1,V1]=svd(A(:,:,i),0);  
+      [U1,S1,V1]=svd(A(:,:,i),0);
       U(:,:,i)=U1; S(:,:,i)=S1; V(:,:,i)=V1;
     else
       [U1,S1,V1]=svd(A(:,:,i));
-      if nargin == 2 
+      if nargin == 2
        U(:,:,i)=U1(:,1:min(k,n1));
        S(:,:,i)=S1(1:min(k,n1),1:min(k,n2));
        V(:,:,i)=V1(:,1:min(k,n2));
       else
           U(:,:,i)=U1; V(:,:,i)=V1; S(:,:,i)=S1;
       end
-      
+
     end
-    
+
 end
 
 U=ifft(U,[],3); V=ifft(V,[],3); S=ifft(S,[],3);
 if exist('transflag','var')
-    Uold =U; U=V; S=tran(S); V=Uold;  
+    Uold =U; U=V; S=tran(S); V=Uold;
 end
