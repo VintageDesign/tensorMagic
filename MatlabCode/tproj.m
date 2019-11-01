@@ -2,8 +2,8 @@ function [P] = tproj(A,U)
 
 % function [P] = tproj(A,U)
 %
-%Given n x 1 x m tensors A and U, P is the projection of A onto U.  
-%NOTE: This assumes U has tensor-length 1, i.e. that 
+%Given n x 1 x m tensors A and U, P is the projection of A onto U.
+%NOTE: This assumes U has tensor-length 1, i.e. that
 %
 %tprod(tran(U),U) = first column of m x m identity.
 %

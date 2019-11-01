@@ -2,7 +2,7 @@ function [vA] = unfold(A)
 
 % function [vA] = unfold(A);
 %
-% Slice A from front to back and create a block-vector out of the slices 
+% Slice A from front to back and create a block-vector out of the slices
 %
 % Note: A should be of type 'tensor' as produced by the tensor command from
 % the Tensor Toolbox.
