@@ -2,10 +2,16 @@ import csv
 import time
 import math
 
+'''
+This script takes the network data from the los Alamos dataset (use download.sh to get it)
+and strips out the src and dest devices for each transmission and sorts them into hourly txt files
+to be read in later.
+
+'''
+
 start = time.time()
 files = {}
 day = 2 # Hard coded for netflow-day-2
-hour = 11 # we only want an hours worth of data cause RAM would fill up... probably will anyway
 for i in range(0, 24):
     name = "day-"+str(day)+"_hour-"+str(i)+".txt"
     f = open(name, "w")
@@ -21,6 +27,7 @@ fieldNames = ["Time", "Duration", "SrcDevice", "DstDevice", "Protocol", "SrcPort
 dictionaries = csv.DictReader(csvFile, fieldnames=fieldNames)
 
 for row in dictionaries:
+    # Why do we use the magic number 6?
     if  row['Protocol'] == '6':
         row["Time"] = math.floor(int(row["Time"]) % 3600*24*(day - 1)/3600)
         singleLine = str(row["SrcDevice"]) +","+ str(row["DstDevice"])+ "\n"
