@@ -1,4 +1,5 @@
 import numpy as np
+import time
 
 
 def loadFile(filename):
@@ -61,8 +62,44 @@ def buildGraphFromFile(filename):
     # return graph
     return adjMatrix, keys
 
+start = time.time()
+t = 20 # number of time slices
+masterKeyIdx = 0
+masterKeyList = {}
+keyList = []
+matrixes = []
+for i in range(0, t):
+    matrix, keys = buildGraphFromFile('../datasets/day2hour9/day-2_hour-9_minute-' + str(i) +'.txt')
+    keyList.append(keys)
+    matrixes.append(matrix)
+
+# Create a unique list of nodes for the whole dataset
+for keys in keyList:
+    for key in keys:
+        if masterKeyList.get(key, None) is None:
+            masterKeyList[key] = masterKeyIdx
+            masterKeyIdx += 1
 
 
-matrix, keys = buildGraphFromFile('../datasets/day2/day-2_hour-11.txt')
+tensor = np.zeros( (len(masterKeyList), len(masterKeyList), t), dtype=np.int8)
+tIdx = 0
+# Move the matrix rows and cols into the new matrix for that hour
+for keys in keyList:
+    for key in keys:
+        oldx = keys[key]
+        newx = masterKeyList[key]
+        for key in keys:
+            oldy = keys[key]
+            if matrixes[tIdx][oldx, oldy] == 1:
+                newy = masterKeyList[key]
+                tensor[ newx , newy, tIdx] = matrixes[tIdx][oldx, oldy]
+                tensor[ newy, newx, tIdx] = matrixes[tIdx][oldy, oldx ]
 
-print(matrix.shape)
+    print("Finished t = " + str(tIdx))
+    tIdx += 1
+
+
+np.savez_compressed('day_2_tensor.npz', tensor)
+end = time.time()
+
+print("Tensor saved to day_2_tensor.npz in " + str ((end - start)/60) + " minutes")
