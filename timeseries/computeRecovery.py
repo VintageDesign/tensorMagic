@@ -1,4 +1,6 @@
 from numpy import linalg
+import numpy as np
+import math
 
 def getRecoveryValue(X, sigma, targetAmount = .9):
     '''
@@ -19,38 +21,32 @@ def getRecoveryValue(X, sigma, targetAmount = .9):
     maxK = 0
 
 
-    for i in range(0, 5):
-        print(sigma[i, i, :])
 
-    for tIndex in range(0, t):
-       # Inital values
-       recoveryPercentage = 0.0
-       kVal = 0
-
-       sigmaT = sigma[:, :, tIndex]
-       xT     = linalg.norm(X[:, :, tIndex], ord='fro')
-       print("t: ", tIndex)
-       print("Fro X^2: ", xT * xT)
-       print("Max K: ", maxK)
+   # Inital values
+    recoveryPercentage = 0.0
+    kVal = 0
 
 
-
-       while recoveryPercentage < targetAmount:
-           kVal += 1
-           sigSum = 0
-
-           for i in range(0, kVal):
-               sigSum += sigmaT[kVal, kVal] * sigmaT[kVal, kVal]
+    xT = 0
+    for i in np.nditer(X):
+        xT += i*i
 
 
-           recoveryPercentage =   (sigSum ) / (xT * xT)
-       print("Sigma Sum: ",  sigSum)
-       print("ER: ",recoveryPercentage, "\n")
+    while recoveryPercentage < targetAmount:
+        kVal += 1
+        sigSum = 0
+
+        for i in range(0, kVal):
+            temp = linalg.norm(sigma[i, i, :])
+            sigSum += temp * temp
+
+
+        recoveryPercentage =   (sigSum ) / ( xT)
 
 
 
-       if kVal > maxK:
-            maxK = kVal
+    if kVal > maxK:
+         maxK = kVal
 
 
 

@@ -7,28 +7,28 @@ from computeRecovery import getRecoveryValue
 
 
 # Save the SVD output cause this takes for ever to run
-if not os.path.exists("day_2_U.npz") or not os.path.exists("day_2_Theta.npz") or not os.path.exists("day_2_D.npz"):
-    tensor = np.load('day_2_tensor.npz')
+if not os.path.exists("baots_U.npz") or not os.path.exists("boats_Theta.npz") or not os.path.exists("boats_D.npz"):
+    tensor = np.load('boats.npz')
     tensor = tensor['arr_0']
     tensor = np.swapaxes(tensor, 1, 2)
     print(tensor.shape)
     U, theta, D = t_svd.t_svd(tensor)
 
-    np.savez_compressed('day_2_U.npz', U)
-    np.savez_compressed('day_2_Theta.npz', theta)
-    np.savez_compressed('day_2_D.npz', D)
+    np.savez_compressed('boats_U.npz', U)
+    np.savez_compressed('boats_Theta.npz', theta)
+    np.savez_compressed('boats_D.npz', D)
 
 else:
-    tensor = np.load('day_2_U.npz')
+    tensor = np.load('boats_U.npz')
     U = tensor['arr_0']
 
-    tensor = np.load('day_2_Theta.npz')
+    tensor = np.load('boats_Theta.npz')
     theta= tensor['arr_0']
 
-    tensor = np.load('day_2_D.npz')
+    tensor = np.load('boats_D.npz')
     D = tensor['arr_0']
 
-    tensor = np.load('day_2_tensor.npz')
+    tensor = np.load('boats.npz')
     tensor = tensor['arr_0']
 
 
