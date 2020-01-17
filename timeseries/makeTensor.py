@@ -98,7 +98,7 @@ for keys in keyList:
     print("Finished t = " + str(tIdx))
     tIdx += 1
 
-
+print(tensor.shape)
 np.savez_compressed('day_2_tensor.npz', tensor)
 end = time.time()
 
