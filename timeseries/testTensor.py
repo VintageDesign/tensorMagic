@@ -1,6 +1,7 @@
 import t_svd
 import L_svd
 import scipy
+import time
 import numpy as np
 import numpy.linalg as linalg
 import os.path
@@ -9,8 +10,8 @@ from matplotlib.pylab import plt #load plot library
 
 from computeRecovery import getRecoveryValue, getRecoveryValueMatrix
 from plotRecoveryTensor import plotRecovery, plotRecoveryMatrix
-filename = "boats"
-
+filename = "day2"
+start = time.time()
 
 # Save the SVD output cause this takes for ever to run
 if  not os.path.exists(filename + "_Theta.npz") or not os.path.exists(filename + "_D.npz"):
@@ -71,30 +72,30 @@ else:
 print("DCT_svd:", getRecoveryValue(tensor, sigma))
 DCTSvdResults = plotRecovery(tensor, sigma)
 
-if  not os.path.exists(filename + "_Theta_hilbert.npz") or not os.path.exists(filename + "_D_hilbert.npz"):
-    print("Recalulating Hilbert_Svd")
-    sigma, D = L_svd.L_svd(tensor, 'hilbert')
+if  not os.path.exists(filename + "_Theta_hwt.npz") or not os.path.exists(filename + "_D_hwt.npz"):
+    print("Recalulating hwt_Svd")
+    sigma, D = L_svd.L_svd(tensor, 'hwt')
 
-    #np.savez_compressed(filename + '_U_hilbert.npz', U)
-    np.savez_compressed(filename + '_Theta_hilbert.npz', sigma)
-    np.savez_compressed(filename + '_D_hilbert.npz', D)
+    #np.savez_compressed(filename + '_U_hwt.npz', U)
+    np.savez_compressed(filename + '_Theta_hwt.npz', sigma)
+    np.savez_compressed(filename + '_D_hwt.npz', D)
 
 else:
-    #tensor = np.load(filename + '_U_hilbert.npz')
+    #tensor = np.load(filename + '_U_hwt.npz')
     #U = tensor['arr_0']
 
-    tensor = np.load(filename + '_Theta_hilbert.npz')
+    tensor = np.load(filename + '_Theta_hwt.npz')
     sigma= tensor['arr_0']
 
-    tensor = np.load(filename + '_D_hilbert.npz')
+    tensor = np.load(filename + '_D_hwt.npz')
     D = tensor['arr_0']
 
     tensor = np.load(filename + '.npz')
     tensor = tensor['arr_0']
     tensor = np.swapaxes(tensor, 1, 2)
 
-print("Hilbert_svd:", getRecoveryValue(tensor, sigma))
-HilbertSvdResults = plotRecovery(tensor, sigma)
+print("HWT_svd:", getRecoveryValue(tensor, sigma))
+hwtSvdResults = plotRecovery(tensor, sigma)
 
 # Now the same math, but in 2D
 
@@ -112,10 +113,12 @@ Sigmat = linalg.svd(matrix, full_matrices=True, compute_uv=False)
 print(Sigmat.shape)
 print("Standard 2d SVD:", getRecoveryValueMatrix(matrix, Sigmat))
 svdResults = plotRecoveryMatrix(matrix, Sigmat)
+end = time.time()
+print("This little manuver just cost us", end-start, "seconds")
 
 plt.plot(tSvdResults, label='T_SVD')
 plt.plot(DCTSvdResults, label='DCT_SVD')
-plt.plot(HilbertSvdResults, label='Hilbert_SVD')
+plt.plot(hwtSvdResults, label='HWT_SVD')
 plt.plot(svdResults, label='Matrix SVD')
 plt.legend()
 plt.show()

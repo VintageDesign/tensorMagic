@@ -1,57 +1,21 @@
 """
 Created on Thu Apr 26 10:46:08 2018
 @author: lsj
+Heavily modified by Riley Kopp
 """
 import numpy as np
 from numpy import *
 from scipy.fftpack import fft,ifft,dct,idct
 from scipy.signal import hilbert
+from sympy.core import S, Symbol, sympify
 
 
-def dct_trans(y):
-    n = max(y.shape)
-    X = y
-    a = zeros((1, 1, n))
-    I = eye(n)
-    Z = diag(ones(n-1), 1)
-    W = diag(C[:,0])
-#    b = np.linalg.inv(W)*C*(Z+I)*X
-    b = np.dot(np.dot(np.dot(np.linalg.inv(W),C),(Z+I)),X)
-    for i in range(n):
-        a[0, 0, i] = b[i]
-    return a
-
-
-def idct_trans(y):
-    n = max(y.shape)
-    X = y
-    a = zeros((1, 1, n))
-    I = eye(n)
-    C=idct(I, axis = -1, norm = 'ortho')
-    Z = diag(ones(n-1), 1)
-    W = diag(C[:,0])
-#    b = np.linalg.inv(I+Z)*(C.T*(W*X))
-    b = np.dot(np.linalg.inv(I+Z), np.dot(C.T,np.dot(W,X)))
-    for i in range(n):
-        a[0, 0, i] = b[i]
-    return a
 
 def my_dct(A):
-    [n1, n2, n3] = A.shape
-    #for i in range(n1):
-        #for j in range(n2):
     C=dct(A, axis =-1 , norm = 'ortho')
-            #g = dct_trans(A[i, :, :])
-            #a[i, j, :] = g
     return C
 def my_idct(A):
-    [n1, n2, n3] = A.shape
-    #a = zeros((n1, n2, n3))
     C=dct(A, axis =-1 , norm = 'ortho')
-    #for i in range(n1):
-    #    for j in range(n2):
-    #        g = idct_trans(A[i, j, :])
-    #        a[i, j, :] = g
     return C
 
 def my_fft(A):
@@ -61,7 +25,29 @@ def my_ifft(A):
     a = ifft(A, axis = -1)
     return a
 
+def hwtTensor(A):
+    x, z, y = A.shape
 
+    a = np.zeros((x, z, y))
+
+    # O(ufta)
+    for xIndex in range(0, x):
+        for zIndex in range(0, z):
+            a[xIndex, zIndex, :] = hwt(A[xIndex, zIndex, :], inverse=False)
+
+    return a
+
+def ihwtTensor(A):
+    x, z, y = A.shape
+
+    a = np.zeros((x, z, y))
+
+    # O(ufta)
+    for xIndex in range(0, x):
+        for zIndex in range(0, z):
+            a[xIndex, zIndex, :] = hwt(A[xIndex, zIndex, :], inverse=True)
+
+    return a
 
 def trans(A, flag = 'fft'):
     [n1, n2, n3] = A.shape
@@ -70,8 +56,8 @@ def trans(A, flag = 'fft'):
         a = my_fft(A)
     elif flag  == 'dct':
         a = my_dct(A)
-    elif flag  == 'hilbert':
-        a = hilbert(A, axis=-1)
+    elif flag  == 'hwt':
+        a = hwtTensor(A)
     return a
 
 
@@ -83,6 +69,36 @@ def invtrans(A, flag = 'fft'):
     elif flag == 'dct':
         a = my_idct(A)
 #        print(a.dtype, flag)
-    elif flag  == 'hilbert':
-        a = hilbert(np.real(A), axis=-1)
+    elif flag  == 'hwt':
+        a = ihwtTensor(A)
+    return a
+
+def hwt(seq, inverse=False):
+    """Utility function for the Walsh Hadamard Transform"""
+
+    if not iterable(seq):
+        raise TypeError("Expected a sequence of coefficients "
+                        "for Walsh Hadamard Transform")
+
+    a = [sympify(arg) for arg in seq]
+    n = len(a)
+    if n < 2:
+        return a
+
+    if n&(n - 1):
+        n = 2**n.bit_length()
+
+    a += [S.Zero]*(n - len(a))
+    h = 2
+    while h <= n:
+        hf, ut = h // 2, n // h
+        for i in range(0, n, h):
+            for j in range(hf):
+                u, v = a[i + j], a[i + j + hf]
+                a[i + j], a[i + j + hf] = u + v, u - v
+        h *= 2
+
+    if inverse:
+        a = [x/n for x in a]
+
     return a
