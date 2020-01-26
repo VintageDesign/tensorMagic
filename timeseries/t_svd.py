@@ -18,7 +18,7 @@ def t_svd( M):
     Vf = zeros((n2,n2,n3), dtype = complex)
 
     for i in range(n3):
-        temp_U ,temp_Theta, temp_V = la.svd(D[: ,: ,i], full_matrices=True, hermitian=True);
+        temp_U ,temp_Theta, temp_V = la.svd(D[: ,: ,i], full_matrices=True);
 #        Uf[: ,: ,i] = temp_U;
         Thetaf[:n2, :n2, i] = np.diag(temp_Theta)
         Vf[:, :, i] = temp_V;
