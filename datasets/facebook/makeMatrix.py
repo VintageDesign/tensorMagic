@@ -25,3 +25,4 @@ for edge in edges:
     matrix[end, start] = 1
 
 
+np.savez_compressed(filename+'.npz', matrix)
